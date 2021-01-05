@@ -1,0 +1,57 @@
+services:
+    MultiTenancyBundle\Repository\TenantRepository:
+        autowire: true
+        tags: ['doctrine.repository_service']
+    
+    MultiTenancyBundle\Repository\HostnameRepository:
+        autowire: true
+        tags: ['doctrine.repository_service']
+
+    MultiTenancyBundle\Service\TenantCreateDatabase:
+        autowire: true
+        tags: ['@Doctrine\Persistence\ManagerRegistry']
+
+    MultiTenancyBundle\Service\TenantDatabaseName:
+        autowire: true
+        tags: ['@MultiTenancyBundle\Repository\HostnameRepository']
+
+    MultiTenancyBundle\EventListener\TenantRequestListener:
+        arguments: ['@doctrine.dbal.tenant_connection', '@MultiTenancyBundle\Repository\HostnameRepository']
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    MultiTenancyBundle\EventListener\EntityTenantEventListener:
+        arguments: ['@MultiTenancyBundle\Service\TenantCreateDatabase']
+        tags:
+            -
+                name: 'doctrine.orm.entity_listener'
+                event: 'postPersist'
+                entity: 'MultiTenancyBundle\Entity\Tenant'
+                priority: 500
+                lazy: true
+
+    MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand:
+        class: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
+        arguments: ['@Doctrine\Persistence\ManagerRegistry', '@Symfony\Component\HttpKernel\KernelInterface']
+        abstract:  true
+
+    MultiTenancyBundle\Command\Migration\StatusCommand:
+        class: MultiTenancyBundle\Command\Migration\StatusCommand
+        arguments: ['@MultiTenancyBundle\Service\TenantDatabaseName']
+        parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
+        tags: 
+             - {name: 'console.command', command: 'tenancy:status'}
+    
+    MultiTenancyBundle\Command\Migration\DiffCommand:
+        class: MultiTenancyBundle\Command\Migration\DiffCommand
+        arguments: ['@MultiTenancyBundle\Service\TenantDatabaseName']
+        parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
+        tags: 
+             - {name: 'console.command', command: 'tenancy:diff'}
+    
+    MultiTenancyBundle\Command\Migration\MigrateCommand:
+        class: MultiTenancyBundle\Command\Migration\MigrateCommand
+        arguments: ['@MultiTenancyBundle\Repository\TenantRepository']
+        parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
+        tags: 
+             - {name: 'console.command', command: 'tenancy:migrate'}
