@@ -36,22 +36,35 @@ services:
         abstract:  true
 
     MultiTenancyBundle\Command\Migration\StatusCommand:
+        autowire: true
         class: MultiTenancyBundle\Command\Migration\StatusCommand
-        arguments: ['@MultiTenancyBundle\Service\TenantDatabaseName']
+        calls:
+            - method: setTenantDatabaseName
+              arguments:
+                  - '@MultiTenancyBundle\Service\TenantDatabaseName'
         parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
         tags: 
              - {name: 'console.command', command: 'tenancy:status'}
     
     MultiTenancyBundle\Command\Migration\DiffCommand:
         class: MultiTenancyBundle\Command\Migration\DiffCommand
-        arguments: ['@MultiTenancyBundle\Service\TenantDatabaseName']
+        calls:
+            - method: setTenantDatabaseName
+              arguments:
+                  - '@MultiTenancyBundle\Service\TenantDatabaseName'
         parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
         tags: 
              - {name: 'console.command', command: 'tenancy:diff'}
     
     MultiTenancyBundle\Command\Migration\MigrateCommand:
         class: MultiTenancyBundle\Command\Migration\MigrateCommand
-        arguments: ['@MultiTenancyBundle\Repository\TenantRepository']
+        calls:
+            - method: setTenantRepository
+              arguments:
+                  - '@MultiTenancyBundle\Repository\TenantRepository'
+            - method: setTenantDatabaseName
+              arguments:
+                  - '@MultiTenancyBundle\Service\TenantDatabaseName'
         parent: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
         tags: 
              - {name: 'console.command', command: 'tenancy:migrate'}

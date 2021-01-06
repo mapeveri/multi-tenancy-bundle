@@ -22,7 +22,7 @@ Via composer
 Configuration
 =============
 
-Configuration to dotrine.yaml
+1. Configuration to dotrine.yaml
 
 ```yaml
 doctrine:
@@ -54,6 +54,12 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity/Main'
                         prefix: 'App\Entity\Main'
                         alias: Main
+                    MultiTenancyBundle:
+                        is_bundle: true
+                        type: annotation
+                        dir: 'Entity'
+                        prefix: 'MultiTenancyBundle\Entity'
+                        alias: MultiTenant
             tenant:
                 connection: tenant
                 mappings:
@@ -65,7 +71,7 @@ doctrine:
                         alias: Tenant
 ```
 
-Configuration to doctrine_migrations.yaml
+2. Configuration to doctrine_migrations.yaml
 
 ```yaml
 doctrine_migrations:
@@ -76,6 +82,16 @@ doctrine_migrations:
 
 **Is important to keep** DoctrineMigrations and DoctrineMigrationsTenant namespaces.
 
+
+3. Add the bundle to bundles.php
+
+```php
+return [
+    ...
+    MultiTenancyBundle\MultiTenancyBundle::class => ['all' => true],
+    ...
+];
+```
 
 Commands for main database
 ==========================
