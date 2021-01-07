@@ -13,23 +13,19 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "ext-ctype": "*",
-        "ext-iconv": "*",
-        "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.8",
-        "phpdocumentor/reflection-docblock": "^5.2",
         "symfony/console": "5.2.*",
-        "symfony/dotenv": "5.2.*",
-        "symfony/flex": "^1.3.1",
-        "symfony/framework-bundle": "5.2.*",
         "symfony/property-access": "5.2.*",
         "symfony/property-info": "5.2.*",
         "symfony/serializer": "5.2.*",
         "symfony/uid": "5.2.*",
         "symfony/yaml": "5.2.*"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^5.2"
     },
     "minimum-stability": "stable",
     "autoload": {

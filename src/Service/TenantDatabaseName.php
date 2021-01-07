@@ -23,21 +23,21 @@ final class TenantDatabaseName implements TenantDatabaseNameInterface
     /**
      * Get uuid name database
      *
-     * @param string|null $tenantName
+     * @param string|null $fqdn
      * @return string
      */
-    public function getName(?string $tenantName = ""): string
+    public function getName(?string $fqdn = ""): string
     {
-        if ($tenantName) {
-            $tenant =  $this->hostnameRepository->findOneBy(["fqdn" => $tenantName]);
+        if ($fqdn) {
+            $hostname =  $this->hostnameRepository->findOneBy(["fqdn" => $fqdn]);
         } else {
-            $tenant = $this->hostnameRepository->findOneBy([]);
+            $hostname = $this->hostnameRepository->findOneBy([]);
         }
 
-        if (!$tenant) {
+        if (!$hostname) {
             throw new TenantNotFound();
         }
 
-        return $tenant->getTenant()->getUuid();
+        return $hostname->getTenant()->getUuid();
     }
 }
