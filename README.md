@@ -10,7 +10,7 @@ Basically a **tenant** is the way to reuse your default code and a **hostname** 
 
 
 Installation
-============
+------------
 
 Via composer
 
@@ -20,7 +20,7 @@ Via composer
 
 
 Configuration
-=============
+-------------
 
 1. Configuration to dotrine.yaml
 
@@ -94,7 +94,7 @@ return [
 ```
 
 Commands for main database
-==========================
+--------------------------
 
 In this case we can use the commands of doctrine:
 
@@ -112,7 +112,7 @@ In this case we can use the commands of doctrine:
 
 
 Commands for tenants
-====================
+--------------------
 
 Genarate migrations
 
@@ -140,3 +140,9 @@ Migrate all tenants
 
 
 In all case the first parameter is the entity manager name and the option --tenant is the tenant name.
+
+
+TODO
+----
+
+1. Right now it only works with MySql, adding another database like postgres, etc.
