@@ -14,19 +14,18 @@ services:
 
     MultiTenancyBundle\Service\TenantCreateDatabase:
         autowire: true
-        tags: ['@MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface']
 
     MultiTenancyBundle\Service\TenantDatabaseName:
         autowire: true
-        tags: ['@MultiTenancyBundle\Repository\HostnameRepository']
 
     MultiTenancyBundle\EventListener\TenantRequestListener:
-        arguments: ['@doctrine.dbal.tenant_connection', '@MultiTenancyBundle\Repository\HostnameRepository']
+        autowire: true
+        arguments: ['@doctrine.dbal.tenant_connection']
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     MultiTenancyBundle\EventListener\EntityTenantEventListener:
-        arguments: ['@MultiTenancyBundle\Service\TenantCreateDatabase']
+        autowire: true
         tags:
             -
                 name: 'doctrine.orm.entity_listener'
@@ -41,7 +40,6 @@ services:
         abstract:  true
 
     MultiTenancyBundle\Command\Migration\StatusCommand:
-        autowire: true
         class: MultiTenancyBundle\Command\Migration\StatusCommand
         calls:
             - method: setTenantDatabaseName
