@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MultiTenancyBundle\EventListener;
 
 use MultiTenancyBundle\Entity\Tenant;
-use MultiTenancyBundle\Service\TenantCreateDatabaseInterface;
+use MultiTenancyBundle\Service\TenantCreateDatabase;
 
 final class EntityTenantEventListener
 {
@@ -14,7 +14,7 @@ final class EntityTenantEventListener
      */
     private $tenantCreateDatabase;
 
-    public function __construct(TenantCreateDatabaseInterface $tenantCreateDatabase)
+    public function __construct(TenantCreateDatabase $tenantCreateDatabase)
     {
         $this->tenantCreateDatabase = $tenantCreateDatabase;
     }

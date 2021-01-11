@@ -1,15 +1,20 @@
 services:
+    MultiTenancyBundle\Doctrine\Database\CreateDatabaseMySql:
+        autowire: true
+
+    MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface: '@MultiTenancyBundle\Doctrine\Database\CreateDatabaseMySql'
+
     MultiTenancyBundle\Repository\TenantRepository:
         autowire: true
         tags: ['doctrine.repository_service']
-    
+
     MultiTenancyBundle\Repository\HostnameRepository:
         autowire: true
         tags: ['doctrine.repository_service']
 
     MultiTenancyBundle\Service\TenantCreateDatabase:
         autowire: true
-        tags: ['@Doctrine\Persistence\ManagerRegistry']
+        tags: ['@MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface']
 
     MultiTenancyBundle\Service\TenantDatabaseName:
         autowire: true

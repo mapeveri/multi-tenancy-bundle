@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MultiTenancyBundle\Command\Migration;
 
 use MultiTenancyBundle\Exception\TenantNotFound;
-use MultiTenancyBundle\Service\TenantDatabaseNameInterface;
+use MultiTenancyBundle\Service\TenantDatabaseName;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,14 +13,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class StatusCommand extends AbstractDoctrineCommand
 {
     /**
-     * @var TenantDatabaseNameInterface
+     * @var TenantDatabaseName
      */
     private $tenantDatabaseName;
 
     /**
      * @required
      */
-    public function setTenantDatabaseName(TenantDatabaseNameInterface $tenantDatabaseName)
+    public function setTenantDatabaseName(TenantDatabaseName $tenantDatabaseName)
     {
         $this->tenantDatabaseName = $tenantDatabaseName;
     }

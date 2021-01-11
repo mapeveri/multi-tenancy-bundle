@@ -6,9 +6,8 @@ namespace MultiTenancyBundle\Service;
 
 use MultiTenancyBundle\Exception\TenantNotFound;
 use MultiTenancyBundle\Repository\HostnameRepository;
-use MultiTenancyBundle\Service\TenantDatabaseNameInterface;
 
-final class TenantDatabaseName implements TenantDatabaseNameInterface
+final class TenantDatabaseName
 {
     /**
      * @var HostnameRepository

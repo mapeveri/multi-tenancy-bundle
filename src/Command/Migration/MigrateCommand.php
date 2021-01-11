@@ -8,7 +8,7 @@ use Exception;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand as DoctrineMigrateCommand;
 use MultiTenancyBundle\Repository\TenantRepository;
-use MultiTenancyBundle\Service\TenantDatabaseNameInterface;
+use MultiTenancyBundle\Service\TenantDatabaseName;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,7 +23,7 @@ final class MigrateCommand extends AbstractDoctrineCommand
     private $tenantRepository;
 
     /**
-     * @var TenantDatabaseNameInterface
+     * @var TenantDatabaseName
      */
     private $tenantDatabaseName;
 
@@ -38,7 +38,7 @@ final class MigrateCommand extends AbstractDoctrineCommand
     /**
      * @required
      */
-    public function setTenantDatabaseName(TenantDatabaseNameInterface $tenantDatabaseName)
+    public function setTenantDatabaseName(TenantDatabaseName $tenantDatabaseName)
     {
         $this->tenantDatabaseName = $tenantDatabaseName;
     }
