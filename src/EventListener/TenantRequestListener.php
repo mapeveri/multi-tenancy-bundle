@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MultiTenancyBundle\EventListener;
 
-use Exception;
+use Throwable;
 use MultiTenancyBundle\Doctrine\DBAL\TenantConnectionInterface;
 use MultiTenancyBundle\Exception\TenantNotFound;
 use MultiTenancyBundle\Exception\TenantConnectionException;
@@ -51,7 +51,7 @@ final class TenantRequestListener
                 // Set tenant connection
                 $tenantDb = $tenant->getTenant()->getUuid();
                 $this->tenantConnection->tenantConnect($tenantDb);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 throw new TenantConnectionException("Error connecting to tenant");
             }
         }
