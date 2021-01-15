@@ -5,6 +5,7 @@ namespace MultiTenancyBundle\Tests\Doctrine\Migration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 use MultiTenancyBundle\Doctrine\Migration\DirectoryMigration;
+use MultiTenancyBundle\Exception\DirectoryMigrationException;
 
 class DirectoryMigrationTest extends TestCase
 {
@@ -26,5 +27,13 @@ class DirectoryMigrationTest extends TestCase
 
         $config = (array)DirectoryMigration::getConfiguration("error", $fileMigrations);
         $this->assertEquals("migrations/Main", $value['migrations_paths']['DoctrineMigrations']);
+    }
+
+    public function testGetConfigurationInvalidFile()
+    {
+        $fileMigrations = [];
+
+        $this->expectException(DirectoryMigrationException::class);
+        DirectoryMigration::getConfiguration("tenant", $fileMigrations);
     }
 }
