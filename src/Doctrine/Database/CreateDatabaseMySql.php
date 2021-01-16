@@ -7,6 +7,8 @@ namespace MultiTenancyBundle\Doctrine\Database;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
+use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
+use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
 use MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface;
 
 final class CreateDatabaseMySql implements CreateDatabaseInterface
@@ -19,11 +21,21 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      * @var EntityManager
      */
     private $emTenant;
+    /**
+     * @var EntityManagerFactory
+     */
+    private $emFactory;
+    /**
+     * @var CreateSchemaFactory
+     */
+    private $createSchemaFactory;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, EntityManagerFactory $emFactory, CreateSchemaFactory $createSchemaFactory)
     {
         $this->em = $registry->getManager('default');
         $this->emTenant = $registry->getManager('tenant');
+        $this->emFactory = $emFactory;
+        $this->createSchemaFactory = $createSchemaFactory;
     }
 
     /**
@@ -39,12 +51,11 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
 
         // Set a new connection to the new tenant
         $conn = $this->getParamsConnectionTenant($dbName);
-        $newEmTenant = EntityManager::create($conn, $this->emTenant->getConfiguration(), $this->emTenant->getEventManager());
+        $newEmTenant = $this->emFactory->create($conn, $this->emTenant->getConfiguration(), $this->emTenant->getEventManager());
         $meta = $newEmTenant->getMetadataFactory()->getAllMetadata();
-        
+
         // Create tables schemas
-        $tool = new SchemaTool($newEmTenant);
-        $tool->createSchema($meta);
+        $this->createSchemaFactory->create($newEmTenant, $meta);
     }
 
     /**
@@ -65,7 +76,7 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
         GRANT ALL ON `{$dbName}`.* TO '{$user}'@'{$host}';
         SQL;
 
-        $this->em->getConnection()->exec($sql);
+        $this->em->getConnection()->executeStatement($sql);
     }
 
 

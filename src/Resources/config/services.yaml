@@ -1,4 +1,10 @@
 services:
+    MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory:
+        autowire: true
+    
+    MultiTenancyBundle\Doctrine\Database\EntityManagerFactory:
+        autowire: true
+
     MultiTenancyBundle\Doctrine\Database\CreateDatabaseMySql:
         autowire: true
 
