@@ -1,4 +1,7 @@
 services:
+    MultiTenancyBundle\Command\Migration\DependencyFactory:
+        autowire: true
+
     MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory:
         autowire: true
     
@@ -42,7 +45,10 @@ services:
 
     MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand:
         class: MultiTenancyBundle\Command\Migration\AbstractDoctrineCommand
-        arguments: ['@Doctrine\Persistence\ManagerRegistry', '@Symfony\Component\HttpKernel\KernelInterface']
+        arguments: [
+            '@Doctrine\Persistence\ManagerRegistry', '@Symfony\Component\HttpKernel\KernelInterface',
+            '@MultiTenancyBundle\Command\Migration\DependencyFactory'
+        ]
         abstract:  true
 
     MultiTenancyBundle\Command\Migration\StatusCommand:

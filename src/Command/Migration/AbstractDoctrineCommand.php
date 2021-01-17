@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace MultiTenancyBundle\Command\Migration;
 
-use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use MultiTenancyBundle\Doctrine\Migration\DirectoryMigration;
 use Symfony\Component\Console\Command\Command;
+use Doctrine\Migrations\DependencyFactory as Df;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Yaml\Yaml;
+use MultiTenancyBundle\Command\Migration\DependencyFactory;
 
 abstract class AbstractDoctrineCommand extends Command
 {
@@ -27,11 +25,17 @@ abstract class AbstractDoctrineCommand extends Command
      */
     private $appKernel;
 
-    public function __construct(ManagerRegistry $registry, KernelInterface $appKernel)
+    /**
+     * @var Df
+     */
+    private $df;
+
+    public function __construct(ManagerRegistry $registry, KernelInterface $appKernel, DependencyFactory $df)
     {
         parent::__construct();
         $this->registry = $registry;
         $this->appKernel = $appKernel;
+        $this->df = $df;
     }
 
     protected function configure(): void
@@ -40,20 +44,17 @@ abstract class AbstractDoctrineCommand extends Command
         $this->addOption('tenant', null, InputOption::VALUE_OPTIONAL);
     }
 
-    protected function getDependencyFactory(InputInterface $input): DependencyFactory
+    protected function getDependencyFactory(InputInterface $input): Df
     {
-        $em = $this->registry->getManager($input->getArgument('em'));
+        $emName = $input->getArgument('em');
+        $em = $this->registry->getManager($emName);
 
-        // Get configuration
         $projectDir = $this->appKernel->getProjectDir();
-        $fileMigrations = Yaml::parseFile($projectDir . '/config/packages/doctrine_migrations.yaml');
 
-        // Define configurations
-        $config = DirectoryMigration::getConfiguration($input->getArgument('em'), $fileMigrations);
-        return DependencyFactory::fromEntityManager($config, new ExistingEntityManager($em));
+        return $this->df->create($em, $emName, $projectDir);
     }
 
-    protected function setTenantConnection(DependencyFactory $df, string $tenantDb): void
+    protected function setTenantConnection(Df $df, string $tenantDb): void
     {
         $tenantConnection = $df->getConnection();
         $tenantConnection->tenantConnect($tenantDb);

@@ -1,0 +1,4 @@
+doctrine_migrations:
+  migrations_paths:
+    'DoctrineMigrations': 'migrations/Main'
+    'DoctrineMigrationsTenant': 'migrations/Tenant'

@@ -7,7 +7,7 @@ namespace MultiTenancyBundle\Doctrine\DBAL;
 use Doctrine\DBAL\Connection;
 use MultiTenancyBundle\Doctrine\DBAL\TenantConnectionInterface;
 
-final class TenantConnectionWrapper extends Connection implements TenantConnectionInterface
+class TenantConnectionWrapper extends Connection implements TenantConnectionInterface
 {
     /**
      * Set the tenant connection

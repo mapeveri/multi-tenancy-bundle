@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MultiTenancyBundle\Command\Migration;
 
-use Exception;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand as DoctrineMigrateCommand;
 use MultiTenancyBundle\Repository\TenantRepository;
@@ -83,11 +82,7 @@ final class MigrateCommand extends AbstractDoctrineCommand
         $tenants = $this->tenantRepository->findAll();
 
         foreach ($tenants as $tenant) {
-            try {
-                $this->migrate($input, $output, $tenant->getUuid());
-            } catch (Exception $e) {
-                $output->writeln("{$e->getMessage()}");
-            }
+            $this->migrate($input, $output, $tenant->getUuid());
         }
     }
 

@@ -12,7 +12,8 @@ class TenantDatabaseNameTest extends TestCase
 {
     public function testGetName()
     {
-        $hostname = TenantUtils::getTenant();
+        $utils = new TenantUtils();
+        $hostname = $utils->getTenant();
 
         $hostnameRepository = $this->createMock(HostnameRepository::class);
         $hostnameRepository->expects($this->any())

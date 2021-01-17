@@ -21,6 +21,6 @@ class MultiTenancyExtensionTest extends TestCase
         $extension->load([], $container);
 
         // Total services defined
-        $this->assertTrue(count($container->getDefinitions()) === 14);
+        $this->assertTrue(count($container->getDefinitions()) === 15);
     }
 }
