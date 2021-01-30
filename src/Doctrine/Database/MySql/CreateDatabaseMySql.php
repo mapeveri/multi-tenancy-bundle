@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MultiTenancyBundle\Doctrine\Database;
+namespace MultiTenancyBundle\Doctrine\Database\MySql;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -10,9 +10,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
 use MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface;
+use MultiTenancyBundle\Doctrine\Database\TenantConnectionTrait;
 
 final class CreateDatabaseMySql implements CreateDatabaseInterface
 {
+    use TenantConnectionTrait;
+
     /**
      * @var EntityManager
      */
@@ -44,13 +47,14 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      * @param string $dbName
      * @return void
      */
-    public function createDatabase(string $dbName): void
+    public function create(string $dbName): void
     {
         // Create the new database tenant
         $this->em->getConnection()->getSchemaManager()->createDatabase("`$dbName`");
 
         // Set a new connection to the new tenant
-        $conn = $this->getParamsConnectionTenant($dbName);
+        $params = $this->em->getConnection()->getParams();
+        $conn = $this->getParamsConnectionTenant($dbName, $params);
         $newEmTenant = $this->emFactory->create($conn, $this->emTenant->getConfiguration(), $this->emTenant->getEventManager());
         $meta = $newEmTenant->getMetadataFactory()->getAllMetadata();
 
@@ -64,9 +68,10 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      * @param string $dbName
      * @return void
      */
-    public function createDatabaseUser(string $dbName, int $tenantId): void
+    public function createUser(string $dbName, int $tenantId): void
     {
-        $conn = $this->getParamsConnectionTenant($dbName);
+        $params = $this->em->getConnection()->getParams();
+        $conn = $this->getParamsConnectionTenant($dbName, $params);
         $user = $conn['user'] . "_{$tenantId}";
         $password = $conn['password'];
         $host = $conn['host'];
@@ -77,26 +82,5 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
         SQL;
 
         $this->em->getConnection()->executeStatement($sql);
-    }
-
-
-    /**
-     * Get tenant connection parameters
-     *
-     * @param string $dbName
-     * @return array
-     */
-    private function getParamsConnectionTenant(string $dbName): array
-    {
-        $params = $this->em->getConnection()->getParams();
-        $conn = array(
-            'driver' => $params['driver'],
-            'host' => $params['host'],
-            'user' => $params['user'],
-            'password' => $params['password'],
-            'dbname' => $dbName
-        );
-
-        return $conn;
     }
 }

@@ -6,7 +6,7 @@ namespace MultiTenancyBundle\Doctrine\Database;
 
 interface CreateDatabaseInterface
 {
-    public function createDatabase(string $dbName): void;
+    public function create(string $dbName): void;
 
-    public function createDatabaseUser(string $dbName, int $tenantId): void;
+    public function createUser(string $dbName, int $tenantId): void;
 }

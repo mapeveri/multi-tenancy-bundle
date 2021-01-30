@@ -12,10 +12,10 @@ class TenantCreateDatabaseTest extends TestCase
     {
         $createDatabaseMock = $this->createMock(CreateDatabaseInterface::class);
         $createDatabaseMock->expects($this->any())
-            ->method('createDatabase')
+            ->method('create')
             ->willReturn(null);
         $createDatabaseMock->expects($this->any())
-            ->method('createDatabaseUser')
+            ->method('createUser')
             ->willReturn(null);
 
         $tenantDatabaseService = new TenantCreateDatabase($createDatabaseMock);

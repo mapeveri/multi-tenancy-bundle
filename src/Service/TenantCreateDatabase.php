@@ -28,7 +28,7 @@ final class TenantCreateDatabase
      */
     public function create(string $dbName, int $tenantId): void
     {
-        $this->createDatabase->createDatabase($dbName);
-        $this->createDatabase->createDatabaseUser($dbName, $tenantId);
+        $this->createDatabase->create($dbName);
+        $this->createDatabase->createUser($dbName, $tenantId);
     }
 }

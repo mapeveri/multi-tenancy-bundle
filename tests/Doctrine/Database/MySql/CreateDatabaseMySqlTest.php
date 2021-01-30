@@ -1,6 +1,6 @@
 <?php
 
-namespace MultiTenancyBundle\Tests\Doctrine\Database;
+namespace MultiTenancyBundle\Tests\Doctrine\Database\MySql;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
@@ -10,7 +10,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use MultiTenancyBundle\Doctrine\Database\CreateDatabaseMySql;
+use MultiTenancyBundle\Doctrine\Database\MySql\CreateDatabaseMySql;
 use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
 
@@ -90,14 +90,14 @@ class CreateDatabaseMySqlTest extends TestCase
     public function testCreateDatabase()
     {
         $createDatabaseMySql = new CreateDatabaseMySql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
-        $createDatabaseMySql->createDatabase('testing');
+        $createDatabaseMySql->create('testing');
         $this->assertTrue(true);
     }
 
     public function testCreateDatabaseUser()
     {
         $createDatabaseMySql = new CreateDatabaseMySql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
-        $createDatabaseMySql->createDatabaseUser('testing', 1);
+        $createDatabaseMySql->createUser('testing', 1);
         $this->assertTrue(true);
     }
 }
