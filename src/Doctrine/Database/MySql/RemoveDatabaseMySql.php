@@ -7,20 +7,17 @@ namespace MultiTenancyBundle\Doctrine\Database\MySql;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use MultiTenancyBundle\Doctrine\Database\RemoveDatabaseInterface;
-use MultiTenancyBundle\Doctrine\Database\TenantConnectionTrait;
 
 final class RemoveDatabaseMySql implements RemoveDatabaseInterface
 {
-    use TenantConnectionTrait;
-
     /**
      * @var EntityManager
      */
-    private $em;
+    private $emTenant;
 
     public function __construct(ManagerRegistry $registry)
     {
-        $this->em = $registry->getManager('default');
+        $this->emTenant = $registry->getManager('tenant');
     }
 
     /**
@@ -31,8 +28,9 @@ final class RemoveDatabaseMySql implements RemoveDatabaseInterface
      */
     public function remove(string $dbName): void
     {
-        // Create the new database tenant
-        $this->em->getConnection()->getSchemaManager()->dropDatabase("`$dbName`");
+        // Remove the new database tenant
+        $params = $this->emTenant->getConnection()->getParams();
+        $this->emTenant->getConnection()->getSchemaManager()->dropDatabase("`$dbName`");
     }
 
     /**
@@ -43,14 +41,13 @@ final class RemoveDatabaseMySql implements RemoveDatabaseInterface
      */
     public function removeUser(string $dbName, int $tenantId): void
     {
-        $params = $this->em->getConnection()->getParams();
-        $conn = $this->getParamsConnectionTenant($dbName, $params);
+        $conn = $this->emTenant->getConnection()->getParams();
         $user = $conn['user'] . "_{$tenantId}";
 
         $sql = <<<SQL
         DROP USER '{$user}';
         SQL;
 
-        $this->em->getConnection()->executeStatement($sql);
+        $this->emTenant->getConnection()->executeStatement($sql);
     }
 }

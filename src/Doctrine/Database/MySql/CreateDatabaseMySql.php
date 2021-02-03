@@ -19,10 +19,6 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
     /**
      * @var EntityManager
      */
-    private $em;
-    /**
-     * @var EntityManager
-     */
     private $emTenant;
     /**
      * @var EntityManagerFactory
@@ -35,7 +31,6 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
 
     public function __construct(ManagerRegistry $registry, EntityManagerFactory $emFactory, CreateSchemaFactory $createSchemaFactory)
     {
-        $this->em = $registry->getManager('default');
         $this->emTenant = $registry->getManager('tenant');
         $this->emFactory = $emFactory;
         $this->createSchemaFactory = $createSchemaFactory;
@@ -49,12 +44,16 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      */
     public function create(string $dbName): void
     {
-        // Create the new database tenant
-        $this->em->getConnection()->getSchemaManager()->createDatabase("`$dbName`");
-
         // Set a new connection to the new tenant
-        $params = $this->em->getConnection()->getParams();
+        $params = $this->emTenant->getConnection()->getParams();
+        
+        // Create the new database tenant
+        $this->emTenant->getConnection()->getSchemaManager()->createDatabase("`$dbName`");
+
+        // Set the database
         $conn = $this->getParamsConnectionTenant($dbName, $params);
+
+        // Get the metadata
         $newEmTenant = $this->emFactory->create($conn, $this->emTenant->getConfiguration(), $this->emTenant->getEventManager());
         $meta = $newEmTenant->getMetadataFactory()->getAllMetadata();
 
@@ -70,8 +69,9 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      */
     public function createUser(string $dbName, int $tenantId): void
     {
-        $params = $this->em->getConnection()->getParams();
+        $params = $this->emTenant->getConnection()->getParams();
         $conn = $this->getParamsConnectionTenant($dbName, $params);
+
         $user = $conn['user'] . "_{$tenantId}";
         $password = $conn['password'];
         $host = $conn['host'];
@@ -81,6 +81,6 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
         GRANT ALL ON `{$dbName}`.* TO '{$user}'@'{$host}';
         SQL;
 
-        $this->em->getConnection()->executeStatement($sql);
+        $this->emTenant->getConnection()->executeStatement($sql);
     }
 }
