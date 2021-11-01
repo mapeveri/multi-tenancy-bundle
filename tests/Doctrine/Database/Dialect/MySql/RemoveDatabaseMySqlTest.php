@@ -1,13 +1,13 @@
 <?php
 
-namespace MultiTenancyBundle\Tests\Doctrine\Database\MySql;
+namespace MultiTenancyBundle\Tests\Doctrine\Database\Dialect\MySql;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use MultiTenancyBundle\Doctrine\Database\MySql\RemoveDatabaseMySql;
+use MultiTenancyBundle\Doctrine\Database\Dialect\MySql\RemoveTenantMySql;
 
 class RemoveDatabaseMySqlTest extends TestCase
 {
@@ -56,15 +56,8 @@ class RemoveDatabaseMySqlTest extends TestCase
 
     public function testRemoveDatabase()
     {
-        $removeDatabaseMySql = new RemoveDatabaseMySql($this->managerRegistry);
-        $removeDatabaseMySql->remove('testing');
-        $this->assertTrue(true);
-    }
-
-    public function testCreateDatabaseUser()
-    {
-        $removeDatabaseMySql = new RemoveDatabaseMySql($this->managerRegistry);
-        $removeDatabaseMySql->removeUser('testing', 1);
+        $removeDatabaseMySql = new RemoveTenantMySql($this->managerRegistry);
+        $removeDatabaseMySql->remove('testing',1);
         $this->assertTrue(true);
     }
 }

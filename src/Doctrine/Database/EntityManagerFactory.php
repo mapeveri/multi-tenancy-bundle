@@ -10,7 +10,7 @@ use Doctrine\Common\EventManager;
 
 class EntityManagerFactory
 {
-    public function create(array $conn, Configuration $configuration, EventManager $eventManager)
+    public function create(array $conn, Configuration $configuration, EventManager $eventManager): EntityManager
     {
         return EntityManager::create($conn, $configuration, $eventManager);
     }

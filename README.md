@@ -22,7 +22,29 @@ Via composer
 Configuration
 -------------
 
-1. Configuration to dotrine.yaml
+1. Configuration .env file
+
+Mysql
+
+```txt
+DATABASE_URL="mysql://user:password8@127.0.0.1:3306/databaseName?serverVersion=5.7&charset=utf8"
+DATABASE_TENANT_URL="mysql://user:password8@127.0.0.1:3306/?serverVersion=5.7&charset=utf8"
+```
+
+In mysql DATABASE_TENANT_URL must be empty the database name value.
+
+PostgreSql
+
+```txt
+DATABASE_URL="postgresql://user:password@localhost:5432/databaseName?charset=utf8"
+DATABASE_TENANT_URL=${DATABASE_URL}
+```
+
+In postgresql DATABASE_TENANT_URL must be the same that DATABASE_URL. This is because PostgreSql has schemas to manage the tenants in the same database.
+
+2. Configuration to dotrine.yaml
+
+Mysql:
 
 ```yaml
 doctrine:
@@ -71,7 +93,56 @@ doctrine:
                         alias: Tenant
 ```
 
-2. Configuration to doctrine_migrations.yaml
+PostgreSql:
+
+```yaml
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_psql'
+                server_version: '12.8'
+                charset: utf8mb4
+
+            tenant:
+                driver: 'pdo_psql'
+                server_version: '12.8'
+                charset: utf8mb4
+                url: '%env(resolve:DATABASE_TENANT_URL)%'
+                wrapper_class: MultiTenancyBundle\Doctrine\DBAL\TenantConnectionWrapper
+
+    orm:
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                mappings:
+                    Main:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/Main'
+                        prefix: 'App\Entity\Main'
+                        alias: Main
+                    MultiTenancyBundle:
+                        is_bundle: true
+                        type: annotation
+                        dir: 'Entity'
+                        prefix: 'MultiTenancyBundle\Entity'
+                        alias: MultiTenant
+            tenant:
+                connection: tenant
+                mappings:
+                    Tenant:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/Tenant'
+                        prefix: 'App\Entity\Tenant'
+                        alias: Tenant
+```
+
+3. Configuration to doctrine_migrations.yaml
 
 ```yaml
 doctrine_migrations:
@@ -80,10 +151,10 @@ doctrine_migrations:
     'DoctrineMigrationsTenant': 'migrations/Tenant'
 ```
 
-**Is important to keep** DoctrineMigrations and DoctrineMigrationsTenant namespaces.
+**It's important to keep** DoctrineMigrations and DoctrineMigrationsTenant namespaces.
 
 
-3. Add the bundle to bundles.php
+4. Add the bundle to bundles.php
 
 ```php
 return [
@@ -96,7 +167,7 @@ return [
 Commands for main database
 --------------------------
 
-In this case we can use the commands of doctrine:
+In this case we can use doctrine commands:
 
 ```console
     php bin/console doctrine:migrations:status
@@ -139,10 +210,10 @@ Migrate all tenants
 ```
 
 
-In all case the first parameter is the entity manager name and the option --tenant is the tenant name.
+In all cases the first parameter is the entity manager name and the option --tenant is the tenant name.
 
 
-TODO
-----
+Supported databases
+-------------------
 
-1. Right now it only works with MySql, adding another database like postgres, etc.
+Right now it only works with MySql and PostgreSql.

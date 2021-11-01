@@ -8,14 +8,26 @@ services:
     MultiTenancyBundle\Doctrine\Database\EntityManagerFactory:
         autowire: true
 
-    MultiTenancyBundle\Doctrine\Database\MySql\CreateDatabaseMySql:
+    MultiTenancyBundle\Doctrine\Database\Dialect\MySql\CreateTenantMySql:
+        autowire: true
+    MultiTenancyBundle\Doctrine\Database\Dialect\MySql\RemoveTenantMySql:
+        autowire: true
+    MultiTenancyBundle\Doctrine\Database\Dialect\PostgreSql\CreateTenantPsql:
+        autowire: true
+    MultiTenancyBundle\Doctrine\Database\Dialect\PostgreSql\RemoveTenantPsql:
+        autowire: true
+    MultiTenancyBundle\Doctrine\Database\Dialect\CreateTenantFactory:
+        autowire: true
+    MultiTenancyBundle\Doctrine\Database\Dialect\RemoveTenantFactory:
         autowire: true
 
-    MultiTenancyBundle\Doctrine\Database\MySql\RemoveDatabaseMySql:
-        autowire: true
+    MultiTenancyBundle\Doctrine\Database\CreateTenantInterface:
+        factory: '@MultiTenancyBundle\Doctrine\Database\Dialect\CreateTenantFactory'
+        arguments: ['@doctrine.dbal.tenant_connection']
 
-    MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface: '@MultiTenancyBundle\Doctrine\Database\MySql\CreateDatabaseMySql'
-    MultiTenancyBundle\Doctrine\Database\RemoveDatabaseInterface: '@MultiTenancyBundle\Doctrine\Database\MySql\RemoveDatabaseMySql'
+    MultiTenancyBundle\Doctrine\Database\RemoveTenantInterface:
+        factory: '@MultiTenancyBundle\Doctrine\Database\Dialect\RemoveTenantFactory'
+        arguments: ['@doctrine.dbal.tenant_connection']
 
     MultiTenancyBundle\Repository\TenantRepository:
         autowire: true

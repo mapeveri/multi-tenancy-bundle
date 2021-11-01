@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace MultiTenancyBundle\Doctrine\Database\MySql;
+namespace MultiTenancyBundle\Doctrine\Database\Dialect\MySql;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use MultiTenancyBundle\Doctrine\Database\RemoveDatabaseInterface;
+use MultiTenancyBundle\Doctrine\Database\RemoveTenantInterface;
 
-final class RemoveDatabaseMySql implements RemoveDatabaseInterface
+class RemoveTenantMySql implements RemoveTenantInterface
 {
     /**
      * @var EntityManager
      */
-    private $emTenant;
+    protected $emTenant;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -24,13 +24,14 @@ final class RemoveDatabaseMySql implements RemoveDatabaseInterface
      * Remove the database tenant
      *
      * @param string $dbName
+     * @param int $tenantId
      * @return void
      */
-    public function remove(string $dbName): void
+    public function remove(string $dbName, int $tenantId): void
     {
         // Remove the new database tenant
-        $params = $this->emTenant->getConnection()->getParams();
         $this->emTenant->getConnection()->getSchemaManager()->dropDatabase("`$dbName`");
+        $this->removeUser($dbName, $tenantId);
     }
 
     /**
@@ -38,8 +39,9 @@ final class RemoveDatabaseMySql implements RemoveDatabaseInterface
      *
      * @param string $dbName
      * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function removeUser(string $dbName, int $tenantId): void
+    private function removeUser(string $dbName, int $tenantId): void
     {
         $conn = $this->emTenant->getConnection()->getParams();
         $user = $conn['user'] . "_{$tenantId}";

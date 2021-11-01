@@ -1,20 +1,20 @@
 <?php
 
-namespace MultiTenancyBundle\Tests\Doctrine\Database\MySql;
+namespace MultiTenancyBundle\Tests\Doctrine\Database\Dialect\PostgreSql;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use MultiTenancyBundle\Doctrine\Database\Dialect\PostgreSql\CreateTenantPsql;
 use PHPUnit\Framework\TestCase;
 use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use MultiTenancyBundle\Doctrine\Database\MySql\CreateDatabaseMySql;
 use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
 
-class CreateDatabaseMySqlTest extends TestCase
+class CreateDatabasePsqlTest extends TestCase
 {
     private $managerRegistry;
     private $emFactory;
@@ -24,7 +24,7 @@ class CreateDatabaseMySqlTest extends TestCase
      * @var array
      */
     protected $params = [
-        'driver' => 'pdo_mysql',
+        'driver' => 'pdo_psql',
         'host' => 'localhost',
         'user' => 'root',
         'password' => 'password',
@@ -43,7 +43,7 @@ class CreateDatabaseMySqlTest extends TestCase
         $this->createSchemaFactory = $this->createMock(CreateSchemaFactory::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->emFactory = $this->createMock(EntityManagerFactory::class);
-        
+
         $connection->expects($this->any())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
@@ -52,10 +52,10 @@ class CreateDatabaseMySqlTest extends TestCase
             ->method('getParams')
             ->willReturn($this->params);
 
-        $schemaManager->expects($this->any())
+        $schemaManager->expects($this->never())
             ->method('createDatabase')
             ->willReturn("");
-        
+
         $classMetadataFactory->expects($this->any())
             ->method('getAllMetadata')
             ->willReturn([]);
@@ -72,7 +72,7 @@ class CreateDatabaseMySqlTest extends TestCase
         $entityManager->expects($this->any())
             ->method('getConnection')
             ->willReturn($connection);
-        
+
         $entityManager->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($configuration);
@@ -81,7 +81,7 @@ class CreateDatabaseMySqlTest extends TestCase
         $this->managerRegistry->expects($this->any())
             ->method('getManager')
             ->willReturn($entityManager);
-        
+
         $this->emFactory->expects($this->any())
             ->method('create')
             ->willReturn($entityManager);
@@ -89,15 +89,8 @@ class CreateDatabaseMySqlTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $createDatabaseMySql = new CreateDatabaseMySql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
-        $createDatabaseMySql->create('testing');
-        $this->assertTrue(true);
-    }
-
-    public function testCreateDatabaseUser()
-    {
-        $createDatabaseMySql = new CreateDatabaseMySql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
-        $createDatabaseMySql->createUser('testing', 1);
+        $createDatabasePsql = new CreateTenantPsql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
+        $createDatabasePsql->create('testing', 1);
         $this->assertTrue(true);
     }
 }

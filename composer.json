@@ -1,6 +1,7 @@
 {
     "name": "mapeveri/multi-tenancy-bundle",
     "description": "Multi-tenancy, is a package for symfony and doctrine to manage tenants in a simple way.",
+    "version": "1.0.1",
     "type": "symfony-bundle",
     "keywords": ["symfony", "bundle", "doctrine", "multi tenancy", "php"],
     "homepage": "https://github.com/mapeveri/multi-tenancy-bundle",
@@ -12,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=7.3",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
@@ -22,7 +23,8 @@
         "symfony/property-info": "5.2.*",
         "symfony/serializer": "5.2.*",
         "symfony/uid": "5.2.*",
-        "symfony/yaml": "5.2.*"
+        "symfony/yaml": "5.2.*",
+        "symfony/expression-language": "5.2.*"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^5.2"
