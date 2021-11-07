@@ -6,6 +6,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use MultiTenancyBundle\Doctrine\Database\Dialect\PostgreSql\CreateTenantPsql;
+use MultiTenancyBundle\Event\CreateTenantEvent;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
 use PHPUnit\Framework\TestCase;
 use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,12 +15,14 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CreateDatabasePsqlTest extends TestCase
 {
     private $managerRegistry;
     private $emFactory;
     private $createSchemaFactory;
+    private $dispatcher;
 
     /**
      * @var array
@@ -43,6 +47,7 @@ class CreateDatabasePsqlTest extends TestCase
         $this->createSchemaFactory = $this->createMock(CreateSchemaFactory::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->emFactory = $this->createMock(EntityManagerFactory::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $connection->expects($this->any())
             ->method('getSchemaManager')
@@ -89,7 +94,21 @@ class CreateDatabasePsqlTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $createDatabasePsql = new CreateTenantPsql($this->managerRegistry, $this->emFactory, $this->createSchemaFactory);
+        $createDatabasePsql = new CreateTenantPsql(
+            $this->managerRegistry,
+            $this->emFactory,
+            $this->createSchemaFactory,
+            $this->dispatcher
+        );
+
+        $event = new CreateTenantEvent('testing', 1);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo($event),
+                $this->equalTo(MultiTenancyEvents::TENANT_CREATED)
+            );
+
         $createDatabasePsql->create('testing', 1);
         $this->assertTrue(true);
     }

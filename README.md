@@ -28,10 +28,8 @@ Mysql
 
 ```txt
 DATABASE_URL="mysql://user:password8@127.0.0.1:3306/databaseName?serverVersion=5.7&charset=utf8"
-DATABASE_TENANT_URL="mysql://user:password8@127.0.0.1:3306/?serverVersion=5.7&charset=utf8"
+DATABASE_TENANT_URL=${DATABASE_URL}
 ```
-
-In mysql DATABASE_TENANT_URL must be empty the database name value.
 
 PostgreSql
 
@@ -39,8 +37,6 @@ PostgreSql
 DATABASE_URL="postgresql://user:password@localhost:5432/databaseName?charset=utf8"
 DATABASE_TENANT_URL=${DATABASE_URL}
 ```
-
-In postgresql DATABASE_TENANT_URL must be the same that DATABASE_URL. This is because PostgreSql has schemas to manage the tenants in the same database.
 
 2. Configuration to dotrine.yaml
 
@@ -110,6 +106,7 @@ doctrine:
                 driver: 'pdo_psql'
                 server_version: '12.8'
                 charset: utf8mb4
+                schema_filter: ~^(?!public)~
                 url: '%env(resolve:DATABASE_TENANT_URL)%'
                 wrapper_class: MultiTenancyBundle\Doctrine\DBAL\TenantConnectionWrapper
 
@@ -217,3 +214,46 @@ Supported databases
 -------------------
 
 Right now it only works with MySql and PostgreSql.
+
+
+Usage
+-----
+
+
+Create a new tenant:
+
+``php
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $tenant = new Tenant();
+        $uuid = Uuid::v4();
+        $tenant->setUuid($uuid->toRfc4122());
+        $entityManager->persist($tenant);
+        $entityManager->flush();
+
+        $hostname = new Hostname();
+        $hostname->setTenant($tenant);
+        $hostname->setFqdn("tenant1");
+
+        $entityManager->persist($hostname);
+        $entityManager->flush();
+``
+
+Remove a tenant:
+
+``php
+        $doctrine = $this->getDoctrine();
+        $entityManager = $doctrine->getManager();
+
+        $hostname = $doctrine
+            ->getRepository(Hostname::class)
+            ->find($hostId);
+        $entityManager->remove($hostname);
+
+        $tenant = $doctrine
+            ->getRepository(Tenant::class)
+            ->find($tenantId);
+
+        $entityManager->remove($tenant);
+        $entityManager->flush();
+``

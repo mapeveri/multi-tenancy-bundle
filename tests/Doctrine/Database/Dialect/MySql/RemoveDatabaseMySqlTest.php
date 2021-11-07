@@ -4,14 +4,18 @@ namespace MultiTenancyBundle\Tests\Doctrine\Database\Dialect\MySql;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use MultiTenancyBundle\Event\RemoveTenantEvent;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
 use PHPUnit\Framework\TestCase;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use MultiTenancyBundle\Doctrine\Database\Dialect\MySql\RemoveTenantMySql;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class RemoveDatabaseMySqlTest extends TestCase
 {
     private $managerRegistry;
+    private $dispatcher;
 
     /**
      * @var array
@@ -31,6 +35,7 @@ class RemoveDatabaseMySqlTest extends TestCase
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
         $connection = $this->createMock(Connection::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         
         $connection->expects($this->any())
             ->method('getSchemaManager')
@@ -56,7 +61,16 @@ class RemoveDatabaseMySqlTest extends TestCase
 
     public function testRemoveDatabase()
     {
-        $removeDatabaseMySql = new RemoveTenantMySql($this->managerRegistry);
+        $removeDatabaseMySql = new RemoveTenantMySql($this->managerRegistry, $this->dispatcher);
+
+        $event = new RemoveTenantEvent('testing', 1);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo($event),
+                $this->equalTo(MultiTenancyEvents::TENANT_REMOVED)
+            );
+
         $removeDatabaseMySql->remove('testing',1);
         $this->assertTrue(true);
     }

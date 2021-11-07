@@ -9,6 +9,9 @@ use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
 use MultiTenancyBundle\Doctrine\Database\CreateTenantInterface;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
 use MultiTenancyBundle\Doctrine\Database\TenantConnectionTrait;
+use MultiTenancyBundle\Event\CreateTenantEvent;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CreateTenantPsql implements CreateTenantInterface
 {
@@ -26,15 +29,21 @@ class CreateTenantPsql implements CreateTenantInterface
      * @var CreateSchemaFactory
      */
     private $createSchemaFactory;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
 
     public function __construct(
         ManagerRegistry $registry,
         EntityManagerFactory $emFactory,
-        CreateSchemaFactory $createSchemaFactory
+        CreateSchemaFactory $createSchemaFactory,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->emTenant = $registry->getManager('tenant');
         $this->emFactory = $emFactory;
         $this->createSchemaFactory = $createSchemaFactory;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -64,5 +73,8 @@ class CreateTenantPsql implements CreateTenantInterface
 
         // Create tables schemas
         $this->createSchemaFactory->create($newEmTenant, $meta);
+
+        $event = new CreateTenantEvent($dbName, $tenantId);
+        $this->dispatcher->dispatch($event, MultiTenancyEvents::TENANT_CREATED);
     }
 }

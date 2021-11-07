@@ -7,6 +7,9 @@ namespace MultiTenancyBundle\Doctrine\Database\Dialect\PostgreSql;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use MultiTenancyBundle\Doctrine\Database\RemoveTenantInterface;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
+use MultiTenancyBundle\Event\RemoveTenantEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class RemoveTenantPsql implements RemoveTenantInterface
 {
@@ -15,9 +18,15 @@ class RemoveTenantPsql implements RemoveTenantInterface
      */
     protected $emTenant;
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $dispatcher)
     {
         $this->emTenant = $registry->getManager('tenant');
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -32,5 +41,8 @@ class RemoveTenantPsql implements RemoveTenantInterface
     {
         // Remove the schema
         $this->emTenant->getConnection()->executeStatement("DROP SCHEMA \"{$dbName}\" CASCADE");
+
+        $event = new RemoveTenantEvent($dbName, $tenantId);
+        $this->dispatcher->dispatch($event, MultiTenancyEvents::TENANT_REMOVED);
     }
 }

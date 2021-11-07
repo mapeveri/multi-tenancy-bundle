@@ -24,7 +24,8 @@
         "symfony/serializer": "5.2.*",
         "symfony/uid": "5.2.*",
         "symfony/yaml": "5.2.*",
-        "symfony/expression-language": "5.2.*"
+        "symfony/expression-language": "5.2.*",
+        "symfony/event-dispatcher": "5.2.*"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^5.2"

@@ -7,6 +7,9 @@ namespace MultiTenancyBundle\Doctrine\Database\Dialect\MySql;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use MultiTenancyBundle\Doctrine\Database\RemoveTenantInterface;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
+use MultiTenancyBundle\Event\RemoveTenantEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class RemoveTenantMySql implements RemoveTenantInterface
 {
@@ -15,9 +18,15 @@ class RemoveTenantMySql implements RemoveTenantInterface
      */
     protected $emTenant;
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $dispatcher)
     {
         $this->emTenant = $registry->getManager('tenant');
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -32,6 +41,9 @@ class RemoveTenantMySql implements RemoveTenantInterface
         // Remove the new database tenant
         $this->emTenant->getConnection()->getSchemaManager()->dropDatabase("`$dbName`");
         $this->removeUser($dbName, $tenantId);
+
+        $event = new RemoveTenantEvent($dbName, $tenantId);
+        $this->dispatcher->dispatch($event, MultiTenancyEvents::TENANT_REMOVED);
     }
 
     /**
