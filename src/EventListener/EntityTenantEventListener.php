@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace MultiTenancyBundle\EventListener;
 
+use MultiTenancyBundle\Doctrine\Database\CreateTenantInterface;
+use MultiTenancyBundle\Doctrine\Database\RemoveTenantInterface;
 use MultiTenancyBundle\Entity\Tenant;
-use MultiTenancyBundle\Service\TenantCreateDatabase;
-use MultiTenancyBundle\Service\TenantRemoveDatabase;
 
 final class EntityTenantEventListener
 {
     /**
-     * @var tenantCreateDatabase
+     * @var CreateTenantInterface
      */
     private $tenantCreateDatabase;
 
     /**
-     * @var TenantRemoveDatabase
+     * @var RemoveTenantInterface
      */
     private $tenantRemoveDatabase;
 
-    public function __construct(TenantCreateDatabase $tenantCreateDatabase, TenantRemoveDatabase $tenantRemoveDatabase)
+    public function __construct(CreateTenantInterface $tenantCreateDatabase, RemoveTenantInterface $tenantRemoveDatabase)
     {
         $this->tenantCreateDatabase = $tenantCreateDatabase;
         $this->tenantRemoveDatabase = $tenantRemoveDatabase;

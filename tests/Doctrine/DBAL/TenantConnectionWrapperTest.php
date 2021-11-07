@@ -4,10 +4,9 @@ namespace MultiTenancyBundle\Tests\Doctrine\DBAL;
 
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Events;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\Common\EventManager;
 use MultiTenancyBundle\Doctrine\DBAL\TenantConnectionWrapper;
 
@@ -28,6 +27,7 @@ class TenantConnectionWrapperTest extends TestCase
     public function testTenantConnect()
     {
         $listenerMock = $this->createMock(ConnectDispatchEventListener::class);
+        $platform = $this->createMock(AbstractPlatform::class);
         $listenerMock->expects($this->once())->method('postConnect');
 
         $eventManager = new EventManager();
@@ -36,6 +36,14 @@ class TenantConnectionWrapperTest extends TestCase
         $driverMock = $this->createMock(Driver::class);
         $driverMock->expects($this->once())
             ->method('connect');
+
+        $driverMock->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue($platform));
+
+        $platform->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('mysql'));
 
         $tenantConnectionWrapper = new TenantConnectionWrapper($this->params, $driverMock, new Configuration(), $eventManager);
         $tenantConnectionWrapper->tenantConnect("databaseName");

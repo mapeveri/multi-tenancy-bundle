@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-namespace MultiTenancyBundle\Doctrine\Database\MySql;
+namespace MultiTenancyBundle\Doctrine\Database\Dialect\MySql;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use MultiTenancyBundle\Doctrine\Database\CreateSchemaFactory;
+use MultiTenancyBundle\Doctrine\Database\CreateTenantInterface;
 use MultiTenancyBundle\Doctrine\Database\EntityManagerFactory;
-use MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface;
 use MultiTenancyBundle\Doctrine\Database\TenantConnectionTrait;
+use MultiTenancyBundle\Event\CreateTenantEvent;
+use MultiTenancyBundle\Event\MultiTenancyEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-final class CreateDatabaseMySql implements CreateDatabaseInterface
+class CreateTenantMySql implements CreateTenantInterface
 {
     use TenantConnectionTrait;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerFactory
      */
-    private $emTenant;
+    protected $emTenant;
     /**
      * @var EntityManagerFactory
      */
@@ -28,25 +29,35 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
      * @var CreateSchemaFactory
      */
     private $createSchemaFactory;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
 
-    public function __construct(ManagerRegistry $registry, EntityManagerFactory $emFactory, CreateSchemaFactory $createSchemaFactory)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerFactory $emFactory,
+        CreateSchemaFactory $createSchemaFactory,
+        EventDispatcherInterface $dispatcher
+    ) {
         $this->emTenant = $registry->getManager('tenant');
         $this->emFactory = $emFactory;
         $this->createSchemaFactory = $createSchemaFactory;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Create the database tenant
      *
      * @param string $dbName
+     * @param int $tenantId
      * @return void
      */
-    public function create(string $dbName): void
+    public function create(string $dbName, int $tenantId): void
     {
         // Set a new connection to the new tenant
         $params = $this->emTenant->getConnection()->getParams();
-        
+
         // Create the new database tenant
         $this->emTenant->getConnection()->getSchemaManager()->createDatabase("`$dbName`");
 
@@ -59,15 +70,21 @@ final class CreateDatabaseMySql implements CreateDatabaseInterface
 
         // Create tables schemas
         $this->createSchemaFactory->create($newEmTenant, $meta);
+
+        $this->createUser($dbName, $tenantId);
+
+        $event = new CreateTenantEvent($dbName, $tenantId);
+        $this->dispatcher->dispatch($event, MultiTenancyEvents::TENANT_CREATED);
     }
 
     /**
      * Create a new user for the new tenant database
      *
      * @param string $dbName
+     * @param int $tenantId
      * @return void
      */
-    public function createUser(string $dbName, int $tenantId): void
+    private function createUser(string $dbName, int $tenantId): void
     {
         $params = $this->emTenant->getConnection()->getParams();
         $conn = $this->getParamsConnectionTenant($dbName, $params);

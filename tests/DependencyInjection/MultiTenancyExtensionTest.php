@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use MultiTenancyBundle\DependencyInjection\MultiTenancyExtension;
-use MultiTenancyBundle\Doctrine\Database\CreateDatabaseInterface;
+use MultiTenancyBundle\Doctrine\Database\CreateTenantInterface;
 
 class MultiTenancyExtensionTest extends TestCase
 {
@@ -21,6 +21,6 @@ class MultiTenancyExtensionTest extends TestCase
         $extension->load([], $container);
 
         // Total services defined
-        $this->assertTrue(count($container->getDefinitions()) === 17);
+        $this->assertTrue(count($container->getDefinitions()) === 23);
     }
 }

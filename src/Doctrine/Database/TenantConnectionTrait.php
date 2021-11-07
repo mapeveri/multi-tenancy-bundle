@@ -15,14 +15,12 @@ trait TenantConnectionTrait
      */
     public function getParamsConnectionTenant(string $dbName, array $params): array
     {
-        $conn = array(
+        return [
             'driver' => $params['driver'],
             'host' => $params['host'],
             'user' => $params['user'],
             'password' => $params['password'],
             'dbname' => $dbName
-        );
-
-        return $conn;
+        ];
     }
 }
