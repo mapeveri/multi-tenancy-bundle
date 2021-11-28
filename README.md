@@ -213,7 +213,7 @@ In all cases the first parameter is the entity manager name and the option --ten
 Supported databases
 -------------------
 
-Right now it only works with MySql and PostgreSql.
+Right now it works with MySql and PostgreSql.
 
 
 Usage
@@ -262,4 +262,4 @@ Remove a tenant:
 
 #### Events
 
-The bundle has tu events, MultiTenancyEvents::TENANT_CREATED and MultiTenancyEvents::TENANT_REMOVED. 
+The bundle has two events, MultiTenancyEvents::TENANT_CREATED and MultiTenancyEvents::TENANT_REMOVED. 
