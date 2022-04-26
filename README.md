@@ -262,4 +262,4 @@ Remove a tenant:
 
 #### Events
 
-The bundle has two events, MultiTenancyEvents::TENANT_CREATED and MultiTenancyEvents::TENANT_REMOVED. 
+The bundle use the event dispatcher component to dispatch events, which are: MultiTenancyEvents::TENANT_CREATED and MultiTenancyEvents::TENANT_REMOVED. 
