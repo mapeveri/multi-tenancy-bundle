@@ -8,6 +8,7 @@ use MultiTenancyBundle\Repository\TenantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=TenantRepository::class)
@@ -16,8 +17,9 @@ class Tenant implements \JsonSerializable
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\Column(type="uuid", unique=true)
+     * @ORM\CustomIdGenerator(class="doctrine.uuid_generator")
      */
     private $id;
 
@@ -51,7 +53,7 @@ class Tenant implements \JsonSerializable
         $this->hostnames = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

@@ -6,6 +6,7 @@ namespace MultiTenancyBundle\Entity;
 
 use MultiTenancyBundle\Repository\HostnameRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=HostnameRepository::class)
@@ -14,8 +15,9 @@ class Hostname
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\Column(type="uuid", unique=true)
+     * @ORM\CustomIdGenerator(class="doctrine.uuid_generator")
      */
     private $id;
 
@@ -45,7 +47,7 @@ class Hostname
      */
     private $deleted_at;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
