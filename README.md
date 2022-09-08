@@ -38,7 +38,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/databaseName?charset=utf
 DATABASE_TENANT_URL=${DATABASE_URL}
 ```
 
-2. Configuration to dotrine.yaml
+2. doctrine.yaml configuration
 
 Mysql:
 
