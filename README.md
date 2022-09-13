@@ -260,6 +260,7 @@ Remove a tenant:
         $entityManager->flush();
 ```
 
-#### Events
+Events
+------
 
 The bundle use the event dispatcher component to dispatch events, which are: MultiTenancyEvents::TENANT_CREATED and MultiTenancyEvents::TENANT_REMOVED. 
