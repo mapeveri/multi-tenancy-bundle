@@ -1,6 +1,8 @@
 multi-tenancy-bundle
 ====================
 
+**WARNING: this repo is not maintained anymore**
+
 Symfony bundle for multiple tenancy. 
 
 Multi-tenancy, is a package for symfony and doctrine to manage tenants in a simple way. The package has 2 main entities:
